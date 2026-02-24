@@ -1,0 +1,16 @@
+{
+  "name": "简单游戏大厅",
+  "short_name": "简单游戏",
+  "description": "适合小学生的益智游戏合集",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f0f4ff",
+  "theme_color": "#4a90d9",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%234a90d9'/%3E%3Ctext x='96' y='120' font-size='100' text-anchor='middle' fill='white' font-family='Arial'%3E🎮%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}

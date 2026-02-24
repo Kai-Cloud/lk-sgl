@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>简单游戏大厅</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+
+  <div class="header">
+    <h1>简单游戏大厅</h1>
+    <p>动动脑筋，快乐成长</p>
+  </div>
+
+  <div class="card-grid">
+
+    <a href="sliding-puzzle.html" class="game-card" style="display:block;">
+      <div class="card-thumb" style="background:linear-gradient(135deg,#a8d8ea,#56b4f9);">
+        <span>🧩</span>
+      </div>
+      <div class="card-body">
+        <h2>数字华容道</h2>
+        <p>滑动数字方块，按顺序排列它们。9个关卡，从简单到困难！</p>
+      </div>
+    </a>
+
+    <div class="game-card card-coming">
+      <div class="card-thumb" style="background:linear-gradient(135deg,#f9e2ae,#f0c060);">
+        <span>🧠</span>
+      </div>
+      <div class="card-body">
+        <h2>记忆翻牌</h2>
+        <p>翻开卡片，找到相同的一对。训练你的记忆力！</p>
+      </div>
+    </div>
+
+    <div class="game-card card-coming">
+      <div class="card-thumb" style="background:linear-gradient(135deg,#c8e6c9,#66bb6a);">
+        <span>🔢</span>
+      </div>
+      <div class="card-body">
+        <h2>速算挑战</h2>
+        <p>限时算术题，看看你能答对多少道！</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(function() {});
+    }
+  </script>
+</body>
+</html>

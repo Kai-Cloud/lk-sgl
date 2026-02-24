@@ -1,0 +1,304 @@
+/* ========== Reset & Base ========== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 18px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: -apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: linear-gradient(135deg, #e8f0fe 0%, #f0e6ff 100%);
+  color: #333;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ========== Header ========== */
+.header {
+  text-align: center;
+  padding: 30px 16px 10px;
+}
+
+.header h1 {
+  font-size: 2rem;
+  color: #4a90d9;
+  letter-spacing: 2px;
+}
+
+.header p {
+  font-size: 1rem;
+  color: #888;
+  margin-top: 6px;
+}
+
+/* ========== Game Card Grid ========== */
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 20px 16px 40px;
+}
+
+.game-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  width: 280px;
+  margin: 14px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.game-card:active {
+  transform: scale(0.97);
+}
+
+.card-thumb {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+}
+
+.card-body {
+  padding: 16px 20px 20px;
+}
+
+.card-body h2 {
+  font-size: 1.3rem;
+  margin-bottom: 6px;
+}
+
+.card-body p {
+  font-size: 0.85rem;
+  color: #888;
+  line-height: 1.5;
+}
+
+.card-coming {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.card-coming .card-body::after {
+  content: '即将推出';
+  display: block;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #bbb;
+  font-weight: bold;
+}
+
+/* ========== Puzzle Page ========== */
+.page-wrapper {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 16px 40px;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+}
+
+.top-bar .back-btn {
+  font-size: 1rem;
+  color: #4a90d9;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+}
+
+.top-bar h1 {
+  font-size: 1.3rem;
+  color: #4a90d9;
+}
+
+/* ========== Level Select ========== */
+.level-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.level-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  border: none;
+  margin: 6px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s;
+  font-family: inherit;
+  position: relative;
+}
+
+.level-btn:active {
+  transform: scale(0.92);
+}
+
+.level-btn.unlocked {
+  background: linear-gradient(135deg, #56b4f9, #4a90d9);
+}
+
+.level-btn.locked {
+  background: #ccc;
+  color: #999;
+  cursor: default;
+}
+
+.level-stars {
+  font-size: 0.55rem;
+  margin-top: 2px;
+  letter-spacing: 1px;
+}
+
+/* ========== Game Board ========== */
+.game-area {
+  display: none;
+}
+
+.game-area.active {
+  display: block;
+}
+
+.info-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+
+.info-bar span {
+  color: #555;
+}
+
+.board-container {
+  position: relative;
+  margin: 0 auto;
+  /* width set by JS */
+}
+
+.tile {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  transition: left 0.15s ease, top 0.15s ease;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.tile:active {
+  filter: brightness(1.1);
+}
+
+/* ========== Buttons ========== */
+.btn-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.btn {
+  padding: 12px 28px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 0 6px;
+  font-family: inherit;
+  transition: transform 0.12s;
+}
+
+.btn:active {
+  transform: scale(0.95);
+}
+
+.btn-reset {
+  background: #f0f0f0;
+  color: #555;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #56b4f9, #4a90d9);
+  color: #fff;
+}
+
+/* ========== Win Overlay ========== */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.45);
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.overlay.show {
+  display: flex;
+}
+
+.win-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 36px 40px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  max-width: 340px;
+  width: 90%;
+}
+
+.win-card h2 {
+  font-size: 1.5rem;
+  color: #4a90d9;
+  margin-bottom: 8px;
+}
+
+.win-stars {
+  font-size: 2.5rem;
+  margin: 12px 0;
+}
+
+.win-card p {
+  color: #777;
+  margin-bottom: 18px;
+}
+
+.win-card .btn {
+  margin: 6px;
+}
+
+/* ========== Tile Colors ========== */
+/* Colors assigned via JS inline style for flexibility */
