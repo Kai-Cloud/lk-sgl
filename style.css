@@ -302,3 +302,181 @@ a {
 
 /* ========== Tile Colors ========== */
 /* Colors assigned via JS inline style for flexibility */
+
+/* ========== Memory Game ========== */
+.memory-board {
+  display: grid;
+  gap: 8px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.memory-card {
+  aspect-ratio: 1;
+  -webkit-perspective: 600px;
+  perspective: 600px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  -webkit-transition: -webkit-transform 0.4s;
+  transition: transform 0.4s;
+}
+
+.memory-card.flipped .card-inner {
+  -webkit-transform: rotateY(180deg);
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.card-front {
+  background: linear-gradient(135deg, #56b4f9, #4a90d9);
+  color: #fff;
+}
+
+.card-back {
+  background: #fff;
+  border: 3px solid #4a90d9;
+  -webkit-transform: rotateY(180deg);
+  transform: rotateY(180deg);
+}
+
+.memory-card.matched .card-back {
+  border-color: #1dd1a1;
+  background: #e6fff5;
+}
+
+.card-back-word {
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: bold;
+}
+
+.card-back-emoji {
+  font-size: 2rem;
+}
+
+/* ========== Math Challenge ========== */
+.timer-bar-wrap {
+  width: 100%;
+  height: 10px;
+  background: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.timer-bar {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #56b4f9, #4a90d9);
+  border-radius: 5px;
+  transition: width 1s linear;
+}
+
+.timer-bar.timer-warning {
+  background: linear-gradient(90deg, #feca57, #ff9f43);
+}
+
+.timer-bar.timer-danger {
+  background: linear-gradient(90deg, #ff6b6b, #ee5a24);
+}
+
+.timer-text {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 16px;
+}
+
+.math-question {
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #333;
+  margin: 20px 0 12px;
+}
+
+.math-answer {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #4a90d9;
+  min-height: 2.5rem;
+  margin-bottom: 4px;
+  letter-spacing: 4px;
+}
+
+.math-feedback {
+  text-align: center;
+  font-size: 1rem;
+  min-height: 1.5rem;
+  margin-bottom: 12px;
+}
+
+.feedback-correct {
+  color: #1dd1a1;
+  font-weight: bold;
+}
+
+.feedback-wrong {
+  color: #ff6b6b;
+  font-weight: bold;
+}
+
+.numpad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.numpad-btn {
+  height: 56px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.4rem;
+  font-weight: bold;
+  cursor: pointer;
+  background: #f0f0f0;
+  color: #333;
+  font-family: inherit;
+  transition: transform 0.1s, background 0.1s;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.numpad-btn:active {
+  transform: scale(0.93);
+  background: #ddd;
+}
+
+.numpad-del {
+  background: #ffe0e0;
+  color: #e74c3c;
+}
+
+.numpad-ok {
+  background: linear-gradient(135deg, #56b4f9, #4a90d9);
+  color: #fff;
+}
