@@ -22,6 +22,18 @@
 | `sw.js` | Service Worker（离线缓存） |
 | `manifest.json` | PWA 配置 |
 
+## 局域网部署
+
+确保电脑已安装 [Node.js](https://nodejs.org/)，然后在项目目录下运行：
+
+```bash
+npx serve -l 3000
+```
+
+终端会显示局域网地址，例如 `http://192.168.x.x:3000`。让同一 Wi-Fi 下的 iPad 或手机用浏览器打开该地址即可游玩。
+
+在 iPad Safari 中点击"分享 → 添加到主屏幕"可保存为离线应用。
+
 ## 兼容性
 
 - 兼容老款 iPad（iOS 10+）
