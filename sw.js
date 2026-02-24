@@ -1,4 +1,4 @@
-var CACHE_NAME = 'game-lobby-v2';
+var CACHE_NAME = 'game-lobby-v3';
 var URLS_TO_CACHE = [
   './',
   './index.html',
@@ -35,8 +35,15 @@ self.addEventListener('activate', function(event) {
 
 self.addEventListener('fetch', function(event) {
   event.respondWith(
-    caches.match(event.request).then(function(response) {
-      return response || fetch(event.request);
+    fetch(event.request).then(function(response) {
+      // Network succeeded — update cache and return
+      return caches.open(CACHE_NAME).then(function(cache) {
+        cache.put(event.request, response.clone());
+        return response;
+      });
+    }).catch(function() {
+      // Network failed — fall back to cache
+      return caches.match(event.request);
     })
   );
 });
