@@ -85,6 +85,77 @@
     window.onerror = function(msg, url, line, col, err) {
       document.body.innerHTML = '<pre style="color:red;padding:20px;">JS Error:\n' + msg + '\nLine: ' + line + '\nCol: ' + col + '</pre>';
     };
+
+    /* =====================================================
+       STORAGE ADAPTER FOR LK-SCL INTEGRATION
+       Dual-mode storage: localStorage (standalone) vs postMessage (integrated)
+       ===================================================== */
+    var GameStorage = {
+      isInIframe: window.parent !== window,
+      gameName: 'poetry_game',
+
+      loadProgress: function() {
+        if (this.isInIframe) {
+          // Integrated mode: request from parent
+          window.parent.postMessage({
+            type: 'requestGameProgress',
+            game: this.gameName
+          }, '*');
+          return window.__gameProgress || { unlocked: 1, stars: {} };
+        } else {
+          // Standalone mode: use localStorage (original behavior)
+          try {
+            var data = localStorage.getItem('poetry_progress');
+            if (data) return JSON.parse(data);
+          } catch (e) {}
+          return { unlocked: 1, stars: {} };
+        }
+      },
+
+      saveProgress: function(level, stars, errors, timeSeconds) {
+        if (this.isInIframe) {
+          // Integrated mode: send to parent for server sync
+          window.parent.postMessage({
+            type: 'saveGameProgress',
+            game: this.gameName,
+            level: level,
+            stars: stars,
+            moves: errors || 0,
+            timeSeconds: timeSeconds || 0
+          }, '*');
+        } else {
+          // Standalone mode: use localStorage
+          try {
+            var progress = this.loadProgress();
+            progress.stars[level] = stars;
+            if (level >= progress.unlocked) {
+              progress.unlocked = level + 1;
+            }
+            localStorage.setItem('poetry_progress', JSON.stringify(progress));
+          } catch (e) {}
+        }
+      }
+    };
+
+    // Listen for progress data from parent (integrated mode only)
+    if (GameStorage.isInIframe) {
+      window.addEventListener('message', function(event) {
+        if (event.data.type === 'loadProgress') {
+          window.__gameProgress = event.data.progress;
+          // Trigger re-render if renderLevelSelect exists
+          if (typeof renderLevelSelect === 'function') {
+            renderLevelSelect();
+          }
+        }
+      });
+
+      // Notify parent that game is ready
+      window.parent.postMessage({
+        type: 'gameReady',
+        game: GameStorage.gameName
+      }, '*');
+    }
+
     /* =====================================================
        POEMS DATA (13 poems, Grade 4 Volume 2)
        ===================================================== */
@@ -257,17 +328,13 @@
        STORAGE HELPERS
        ===================================================== */
     function loadProgress() {
-      try {
-        var data = localStorage.getItem('poetry_progress');
-        if (data) return JSON.parse(data);
-      } catch (e) {}
-      return { unlocked: 1, stars: {} };
+      return GameStorage.loadProgress();
     }
 
     function saveProgress(prog) {
-      try {
-        localStorage.setItem('poetry_progress', JSON.stringify(prog));
-      } catch (e) {}
+      var level = currentLevel + 1;
+      var stars = prog.stars[level];
+      GameStorage.saveProgress(level, stars, totalErrors, 0);
     }
 
     /* =====================================================
