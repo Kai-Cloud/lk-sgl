@@ -133,8 +133,7 @@ a {
 /* ========== Level Select ========== */
 .level-grid {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
   margin-bottom: 20px;
 }
 
@@ -479,4 +478,168 @@ a {
 .numpad-ok {
   background: linear-gradient(135deg, #56b4f9, #4a90d9);
   color: #fff;
+}
+
+/* ========== Poetry Game ========== */
+.poem-display {
+  text-align: center;
+  margin: 0 auto 12px;
+}
+
+.poem-display-read {
+  background: #fffdf5;
+  border-radius: 16px;
+  padding: 20px 16px;
+  border: 1px solid #f0e6d0;
+}
+
+.poem-title {
+  font-size: 1.4rem;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.poem-author {
+  font-size: 0.9rem;
+  color: #999;
+  margin-bottom: 14px;
+}
+
+.poem-text {
+  font-size: 1.2rem;
+  line-height: 2;
+  color: #444;
+}
+
+.poem-line {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.poem-char {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.2rem;
+  color: #333;
+  margin: 2px;
+}
+
+.poem-char.punct {
+  width: auto;
+  color: #999;
+}
+
+.poem-char.blank {
+  border: 2px dashed #ccc;
+  border-radius: 6px;
+  color: #ccc;
+  background: #fafafa;
+}
+
+.poem-char.blank.current {
+  border-color: #4a90d9;
+  background: #e8f0fe;
+  color: #4a90d9;
+}
+
+.poem-char.filled {
+  border: none;
+}
+
+.poem-char.correct {
+  color: #1dd1a1;
+  font-weight: bold;
+}
+
+.poem-char.wrong {
+  border-color: #ff6b6b;
+  background: #ffe0e0;
+  animation: shake 0.4s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.char-candidates {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px auto;
+  max-width: 500px;
+}
+
+.char-btn {
+  width: 44px;
+  height: 44px;
+  border: 2px solid #4a90d9;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  background: #fff;
+  color: #333;
+  font-family: inherit;
+  transition: transform 0.1s, background 0.1s;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.char-btn:active {
+  transform: scale(0.92);
+  background: #e8f0fe;
+}
+
+.char-btn.used {
+  background: #eee;
+  color: #ccc;
+  border-color: #ddd;
+  cursor: default;
+}
+
+.phase-title {
+  font-size: 0.9rem;
+  color: #888;
+  background: #f0f0f0;
+  padding: 2px 10px;
+  border-radius: 8px;
+}
+
+.speak-btn {
+  font-size: 1rem;
+}
+
+.error-count {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #e74c3c;
+  margin: 8px 0;
+}
+
+.current-line-hint {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #4a90d9;
+  margin: 8px 0;
+  font-weight: bold;
+}
+
+.active-line {
+  background: #f5f8ff;
+  border-radius: 8px;
+  padding: 2px 0;
+}
+
+.phase-panel {
+  min-height: 200px;
 }

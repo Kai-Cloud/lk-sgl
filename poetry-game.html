@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>古诗背诵</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+
+  <div class="page-wrapper">
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <button class="back-btn" id="backBtn">&#9664; 返回大厅</button>
+      <h1>古诗背诵</h1>
+      <span></span>
+    </div>
+
+    <!-- Level Select -->
+    <div id="levelSelect">
+      <p id="levelGridMsg" style="text-align:center;color:#888;padding:20px;">正在加载关卡…</p>
+      <div class="level-grid" id="levelGrid"></div>
+    </div>
+
+    <!-- Game Area -->
+    <div class="game-area" id="gameArea">
+      <div class="info-bar">
+        <span id="levelLabel">关卡 1</span>
+        <span class="phase-title" id="phaseLabel">跟读</span>
+      </div>
+
+      <!-- Phase 1: Read Aloud -->
+      <div id="phase1" class="phase-panel">
+        <div class="poem-display poem-display-read">
+          <h2 class="poem-title" id="poemTitle"></h2>
+          <p class="poem-author" id="poemAuthor"></p>
+          <div class="poem-text" id="poemText"></div>
+        </div>
+        <div class="btn-row" style="margin-top:16px;">
+          <button class="btn btn-reset speak-btn" id="speakBtn">&#128266; 朗读</button>
+          <button class="btn btn-primary" id="startChallengeBtn">开始挑战</button>
+        </div>
+      </div>
+
+      <!-- Phase 2: Fill in Blanks -->
+      <div id="phase2" class="phase-panel" style="display:none;">
+        <div class="poem-display" id="phase2Display"></div>
+        <div class="error-count" id="phase2Errors">错误：0</div>
+        <div class="char-candidates" id="phase2Candidates"></div>
+      </div>
+
+      <!-- Phase 3: Full Dictation -->
+      <div id="phase3" class="phase-panel" style="display:none;">
+        <div class="poem-display" id="phase3Display"></div>
+        <div class="current-line-hint" id="phase3Hint"></div>
+        <div class="error-count" id="phase3Errors">错误：0</div>
+        <div class="char-candidates" id="phase3Candidates"></div>
+      </div>
+
+      <div class="btn-row" style="margin-top:12px;">
+        <button class="btn btn-reset" id="levelListBtn">选关</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Win Overlay -->
+  <div class="overlay" id="winOverlay">
+    <div class="win-card">
+      <h2 id="winTitle">恭喜过关！</h2>
+      <div class="win-stars" id="winStars"></div>
+      <p id="winMsg"></p>
+      <div>
+        <button class="btn btn-reset" id="winBackBtn">选关</button>
+        <button class="btn btn-primary" id="winNextBtn">下一关</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.onerror = function(msg, url, line, col, err) {
+      document.body.innerHTML = '<pre style="color:red;padding:20px;">JS Error:\n' + msg + '\nLine: ' + line + '\nCol: ' + col + '</pre>';
+    };
+    /* =====================================================
+       POEMS DATA (13 poems, Grade 4 Volume 2)
+       ===================================================== */
+    var POEMS = [
+      {
+        title: '宿新市徐公店',
+        author: '[宋] 杨万里',
+        lines: ['篱落疏疏一径深，', '树头新绿未成阴。', '儿童急走追黄蝶，', '飞入菜花无处寻。']
+      },
+      {
+        title: '四时田园杂兴（其二十五）',
+        author: '[宋] 范成大',
+        lines: ['梅子金黄杏子肥，', '麦花雪白菜花稀。', '日长篱落无人过，', '惟有蜻蜓蛱蝶飞。']
+      },
+      {
+        title: '清平乐·村居',
+        author: '[宋] 辛弃疾',
+        lines: ['茅檐低小，', '溪上青青草。', '醉里吴音相媚好，', '白发谁家翁媪。', '大儿锄豆溪东，', '中儿正织鸡笼。', '最喜小儿亡赖，', '溪头卧剥莲蓬。']
+      },
+      {
+        title: '芙蓉楼送辛渐',
+        author: '[唐] 王昌龄',
+        lines: ['寒雨连江夜入吴，', '平明送客楚山孤。', '洛阳亲友如相问，', '一片冰心在玉壶。']
+      },
+      {
+        title: '塞下曲',
+        author: '[唐] 卢纶',
+        lines: ['月黑雁飞高，', '单于夜遁逃。', '欲将轻骑逐，', '大雪满弓刀。']
+      },
+      {
+        title: '墨梅',
+        author: '[元] 王冕',
+        lines: ['吾家洗砚池头树，', '朵朵花开淡墨痕。', '不要人夸好颜色，', '只留清气满乾坤。']
+      },
+      {
+        title: '蜂',
+        author: '[唐] 罗隐',
+        lines: ['不论平地与山尖，', '无限风光尽被占。', '采得百花成蜜后，', '为谁辛苦为谁甜？']
+      },
+      {
+        title: '独坐敬亭山',
+        author: '[唐] 李白',
+        lines: ['众鸟高飞尽，', '孤云独去闲。', '相看两不厌，', '只有敬亭山。']
+      },
+      {
+        title: '卜算子·咏梅',
+        author: '[宋] 陆游',
+        lines: ['驿外断桥边，', '寂寞开无主。', '已是黄昏独自愁，', '更著风和雨。', '无意苦争春，', '只是花如许。', '零落成泥碾作尘，', '只有香如故。']
+      },
+      {
+        title: '江畔独步寻花（其五）',
+        author: '[唐] 杜甫',
+        lines: ['黄师塔前江水东，', '春光懒困倚微风。', '桃花一簇开无主，', '可爱深红爱浅红？']
+      },
+      {
+        title: '蜀中九日',
+        author: '[唐] 王勃',
+        lines: ['九月九日望乡台，', '他席他乡送客杯。', '人情已厌南中苦，', '鸿雁那从北地来。']
+      },
+      {
+        title: '鹿柴',
+        author: '[唐] 王维',
+        lines: ['空山不见人，', '但闻人语响。', '返景入深林，', '复照青苔上。']
+      },
+      {
+        title: '嫦娥',
+        author: '[唐] 李商隐',
+        lines: ['云母屏风烛影深，', '长河渐落晓星沉。', '嫦娥应悔偷灵药，', '碧海青天夜夜心。']
+      }
+    ];
+
+    /* =====================================================
+       PUNCTUATION & CHAR HELPERS
+       ===================================================== */
+    var PUNCTUATION = "，。？！、；：\u201c\u201d\u2018\u2019《》（）—…· ";
+
+    function isPunct(ch) {
+      return PUNCTUATION.indexOf(ch) >= 0;
+    }
+
+    function getCharsFromLines(lines) {
+      var chars = [];
+      for (var i = 0; i < lines.length; i++) {
+        for (var j = 0; j < lines[i].length; j++) {
+          if (!isPunct(lines[i][j])) {
+            chars.push(lines[i][j]);
+          }
+        }
+      }
+      return chars;
+    }
+
+    function getLineChars(line) {
+      var chars = [];
+      for (var j = 0; j < line.length; j++) {
+        if (!isPunct(line[j])) {
+          chars.push(line[j]);
+        }
+      }
+      return chars;
+    }
+
+    /* =====================================================
+       DISTRACTOR CHARACTER POOL
+       ===================================================== */
+    var DISTRACTOR_POOL = '天地人山水风云花鸟月日星雨雪松竹梅兰菊草木石泉河湖海田村城楼台亭阁桥路门窗帘'
+      + '春夏秋冬朝暮晨昏明暗晴阴寒暖凉热冷温清浊轻重高低远近长短深浅宽窄大小多少'
+      + '红黄蓝绿紫白黑青碧翠金银丹素苍灰'
+      + '飞走跑跳立坐卧行游泳唱吟诵读写画弹奏听望看闻思忆念想知觉悟醒眠休动静开关'
+      + '心情意志愿望梦幻思想感觉忧愁喜乐怒哀惧惊怜惜悲欢离合聚散生死存亡兴衰荣枯'
+      + '父母兄弟姐妹夫妻子女儿童少年老幼男女君臣将士兵卒僧道客商农渔樵牧';
+
+    function generateDistractors(correctChars, count) {
+      var usedSet = {};
+      for (var i = 0; i < correctChars.length; i++) {
+        usedSet[correctChars[i]] = true;
+      }
+      var distractors = [];
+      var pool = DISTRACTOR_POOL;
+      var attempts = 0;
+      while (distractors.length < count && attempts < 500) {
+        var idx = Math.floor(Math.random() * pool.length);
+        var ch = pool[idx];
+        if (!usedSet[ch]) {
+          distractors.push(ch);
+          usedSet[ch] = true;
+        }
+        attempts++;
+      }
+      return distractors;
+    }
+
+    function shuffleArray(arr) {
+      for (var i = arr.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
+      }
+      return arr;
+    }
+
+    /* =====================================================
+       SPEECH SYNTHESIS
+       ===================================================== */
+    function speakPoem(text) {
+      if (!('speechSynthesis' in window)) return;
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = 'zh-CN';
+      u.rate = 0.8;
+      speechSynthesis.speak(u);
+    }
+
+    /* =====================================================
+       STATE
+       ===================================================== */
+    var currentLevel = -1;
+    var currentPhase = 0;
+    var totalErrors = 0;
+    var phase2Errors = 0;
+    var phase3Errors = 0;
+    var blanks = [];         // phase2 blank positions [{lineIdx, charIdx, char}]
+    var blankFillIndex = 0;  // which blank we're filling next in phase2
+    var phase3LineIdx = 0;   // current line in phase3
+    var phase3CharIdx = 0;   // current char position in phase3 line
+    var phase3Blanks = [];   // all blanks for current line in phase3
+
+    /* =====================================================
+       STORAGE HELPERS
+       ===================================================== */
+    function loadProgress() {
+      try {
+        var data = localStorage.getItem('poetry_progress');
+        if (data) return JSON.parse(data);
+      } catch (e) {}
+      return { unlocked: 1, stars: {} };
+    }
+
+    function saveProgress(prog) {
+      try {
+        localStorage.setItem('poetry_progress', JSON.stringify(prog));
+      } catch (e) {}
+    }
+
+    /* =====================================================
+       LEVEL SELECT RENDERING
+       ===================================================== */
+    function renderLevelSelect() {
+      var prog = loadProgress();
+      var msg = document.getElementById('levelGridMsg');
+      if (msg) msg.style.display = 'none';
+      var grid = document.getElementById('levelGrid');
+      grid.innerHTML = '';
+      for (var i = 0; i < POEMS.length; i++) {
+        var btn = document.createElement('button');
+        var hasStar = prog.stars[i + 1];
+        btn.className = 'level-btn unlocked';
+        btn.style.cssText = [
+          'display:flex',
+          'flex-direction:row',
+          'align-items:center',
+          'width:100%',
+          'height:60px',
+          'border-radius:12px',
+          'border:none',
+          'margin:5px 0',
+          'padding:0 16px',
+          'font-size:1rem',
+          'font-weight:bold',
+          'color:#fff',
+          'cursor:pointer',
+          'background:linear-gradient(135deg,#56b4f9,#4a90d9)',
+          'box-sizing:border-box'
+        ].join(';');
+        var starStr = '';
+        if (hasStar) {
+          var s = prog.stars[i + 1];
+          for (var j = 0; j < 3; j++) {
+            starStr += j < s ? '\u2605' : '\u2606';
+          }
+        }
+        btn.innerHTML =
+          '<span style="min-width:28px;opacity:0.85;font-size:0.9rem;">' + (i + 1) + '.</span>' +
+          '<span style="flex:1;text-align:left;">' +
+            '<span style="display:block;">' + POEMS[i].title + '</span>' +
+            '<span style="display:block;font-size:0.7rem;font-weight:normal;opacity:0.85;margin-top:1px;">' + POEMS[i].author + '</span>' +
+          '</span>' +
+          (starStr ? '<span style="font-size:0.8rem;letter-spacing:1px;">' + starStr + '</span>' : '');
+        btn.setAttribute('data-level', i);
+        btn.addEventListener('touchend', onLevelTap, { passive: true });
+        btn.addEventListener('click', onLevelTap);
+        grid.appendChild(btn);
+      }
+    }
+
+    function onLevelTap(e) {
+      e.preventDefault();
+      var idx = parseInt(this.getAttribute('data-level'), 10);
+      startLevel(idx);
+    }
+
+    /* =====================================================
+       START LEVEL
+       ===================================================== */
+    function startLevel(idx) {
+      currentLevel = idx;
+      totalErrors = 0;
+      phase2Errors = 0;
+      phase3Errors = 0;
+
+      document.getElementById('levelSelect').style.display = 'none';
+      var gameArea = document.getElementById('gameArea');
+      gameArea.className = 'game-area active';
+
+      document.getElementById('levelLabel').textContent = POEMS[idx].title;
+
+      startPhase1();
+    }
+
+    /* =====================================================
+       PHASE 1: READ ALOUD
+       ===================================================== */
+    function startPhase1() {
+      currentPhase = 1;
+      document.getElementById('phaseLabel').textContent = '跟读';
+
+      document.getElementById('phase1').style.display = '';
+      document.getElementById('phase2').style.display = 'none';
+      document.getElementById('phase3').style.display = 'none';
+
+      var poem = POEMS[currentLevel];
+      document.getElementById('poemTitle').textContent = poem.title;
+      document.getElementById('poemAuthor').textContent = poem.author;
+
+      var html = '';
+      for (var i = 0; i < poem.lines.length; i++) {
+        html += '<div class="poem-line">' + escapeHtml(poem.lines[i]) + '</div>';
+      }
+      document.getElementById('poemText').innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    /* =====================================================
+       PHASE 2: FILL IN BLANKS
+       ===================================================== */
+    function startPhase2() {
+      currentPhase = 2;
+      phase2Errors = 0;
+      document.getElementById('phaseLabel').textContent = '填空';
+
+      document.getElementById('phase1').style.display = 'none';
+      document.getElementById('phase2').style.display = '';
+      document.getElementById('phase3').style.display = 'none';
+
+      var poem = POEMS[currentLevel];
+
+      // Determine blanks: ~30% of non-punctuation chars
+      var allChars = getCharsFromLines(poem.lines);
+      var blankCount = Math.max(1, Math.round(allChars.length * 0.3));
+
+      // Build position list
+      var positions = [];
+      for (var i = 0; i < poem.lines.length; i++) {
+        for (var j = 0; j < poem.lines[i].length; j++) {
+          if (!isPunct(poem.lines[i][j])) {
+            positions.push({ lineIdx: i, charIdx: j, char: poem.lines[i][j] });
+          }
+        }
+      }
+
+      // Randomly select blank positions
+      var shuffled = shuffleArray(positions.slice());
+      blanks = shuffled.slice(0, blankCount);
+
+      // Sort blanks by position for sequential filling
+      blanks.sort(function(a, b) {
+        return a.lineIdx !== b.lineIdx ? a.lineIdx - b.lineIdx : a.charIdx - b.charIdx;
+      });
+
+      blankFillIndex = 0;
+
+      // Build blank lookup
+      var blankSet = {};
+      for (var k = 0; k < blanks.length; k++) {
+        blankSet[blanks[k].lineIdx + '_' + blanks[k].charIdx] = k;
+      }
+
+      // Render poem with blanks
+      var displayEl = document.getElementById('phase2Display');
+      var html = '';
+      for (var i = 0; i < poem.lines.length; i++) {
+        html += '<div class="poem-line">';
+        for (var j = 0; j < poem.lines[i].length; j++) {
+          var ch = poem.lines[i][j];
+          if (isPunct(ch)) {
+            html += '<span class="poem-char punct">' + escapeHtml(ch) + '</span>';
+          } else {
+            var key = i + '_' + j;
+            if (blankSet[key] !== undefined) {
+              html += '<span class="poem-char blank" data-blank-idx="' + blankSet[key] + '" id="blank2_' + blankSet[key] + '">\u25a1</span>';
+            } else {
+              html += '<span class="poem-char">' + escapeHtml(ch) + '</span>';
+            }
+          }
+        }
+        html += '</div>';
+      }
+      displayEl.innerHTML = html;
+
+      updatePhase2Errors();
+      renderPhase2Candidates();
+      highlightCurrentBlank2();
+    }
+
+    function renderPhase2Candidates() {
+      // Correct chars (all blank chars)
+      var correctChars = [];
+      for (var i = 0; i < blanks.length; i++) {
+        correctChars.push(blanks[i].char);
+      }
+
+      // Distractors: ~5 extra
+      var distractors = generateDistractors(correctChars, 5);
+      var allChars = correctChars.concat(distractors);
+      shuffleArray(allChars);
+
+      var container = document.getElementById('phase2Candidates');
+      container.innerHTML = '';
+      for (var i = 0; i < allChars.length; i++) {
+        var btn = document.createElement('button');
+        btn.className = 'char-btn';
+        btn.textContent = allChars[i];
+        btn.setAttribute('data-char', allChars[i]);
+        btn.addEventListener('click', onPhase2CandidateClick);
+        btn.addEventListener('touchend', onPhase2CandidateClick, { passive: false });
+        container.appendChild(btn);
+      }
+    }
+
+    function highlightCurrentBlank2() {
+      // Remove previous highlights
+      var allBlanks = document.querySelectorAll('#phase2Display .blank');
+      for (var i = 0; i < allBlanks.length; i++) {
+        allBlanks[i].classList.remove('current');
+      }
+      if (blankFillIndex < blanks.length) {
+        var el = document.getElementById('blank2_' + blankFillIndex);
+        if (el) el.classList.add('current');
+      }
+    }
+
+    function onPhase2CandidateClick(e) {
+      e.preventDefault();
+      if (currentPhase !== 2 || blankFillIndex >= blanks.length) return;
+
+      var selectedChar = this.getAttribute('data-char');
+      var expected = blanks[blankFillIndex].char;
+      var blankEl = document.getElementById('blank2_' + blankFillIndex);
+
+      if (selectedChar === expected) {
+        // Correct
+        blankEl.textContent = expected;
+        blankEl.classList.remove('blank', 'current');
+        blankEl.classList.add('filled', 'correct');
+        blankFillIndex++;
+
+        if (blankFillIndex >= blanks.length) {
+          // Phase 2 complete
+          setTimeout(function() {
+            startPhase3();
+          }, 500);
+        } else {
+          highlightCurrentBlank2();
+        }
+      } else {
+        // Wrong
+        phase2Errors++;
+        totalErrors++;
+        updatePhase2Errors();
+        blankEl.classList.add('wrong');
+        setTimeout(function() {
+          blankEl.classList.remove('wrong');
+        }, 500);
+      }
+    }
+
+    function updatePhase2Errors() {
+      document.getElementById('phase2Errors').textContent = '错误：' + phase2Errors;
+    }
+
+    /* =====================================================
+       PHASE 3: FULL DICTATION
+       ===================================================== */
+    function startPhase3() {
+      currentPhase = 3;
+      phase3Errors = 0;
+      phase3LineIdx = 0;
+      document.getElementById('phaseLabel').textContent = '默写';
+
+      document.getElementById('phase1').style.display = 'none';
+      document.getElementById('phase2').style.display = 'none';
+      document.getElementById('phase3').style.display = '';
+
+      var poem = POEMS[currentLevel];
+
+      // Render poem with all chars blank
+      var displayEl = document.getElementById('phase3Display');
+      var html = '';
+      for (var i = 0; i < poem.lines.length; i++) {
+        html += '<div class="poem-line" id="phase3line_' + i + '">';
+        for (var j = 0; j < poem.lines[i].length; j++) {
+          var ch = poem.lines[i][j];
+          if (isPunct(ch)) {
+            html += '<span class="poem-char punct">' + escapeHtml(ch) + '</span>';
+          } else {
+            html += '<span class="poem-char blank" data-line="' + i + '" data-pos="' + j + '" id="blank3_' + i + '_' + j + '">\u25a1</span>';
+          }
+        }
+        html += '</div>';
+      }
+      displayEl.innerHTML = html;
+
+      updatePhase3Errors();
+      startPhase3Line(0);
+    }
+
+    function startPhase3Line(lineIdx) {
+      phase3LineIdx = lineIdx;
+      var poem = POEMS[currentLevel];
+
+      if (lineIdx >= poem.lines.length) {
+        // All lines done
+        endGame();
+        return;
+      }
+
+      // Set hint
+      var hintEl = document.getElementById('phase3Hint');
+      hintEl.textContent = '第 ' + (lineIdx + 1) + ' 句';
+
+      // Highlight current line
+      for (var i = 0; i < poem.lines.length; i++) {
+        var lineEl = document.getElementById('phase3line_' + i);
+        if (lineEl) {
+          lineEl.classList.toggle('active-line', i === lineIdx);
+        }
+      }
+
+      // Build blanks for this line
+      var line = poem.lines[lineIdx];
+      phase3Blanks = [];
+      for (var j = 0; j < line.length; j++) {
+        if (!isPunct(line[j])) {
+          phase3Blanks.push({ pos: j, char: line[j] });
+        }
+      }
+      phase3CharIdx = 0;
+
+      // Generate candidates for this line
+      var lineChars = getLineChars(line);
+      var distractorCount = Math.max(2, Math.ceil(lineChars.length * 0.4));
+      var distractors = generateDistractors(lineChars, distractorCount);
+      var allChars = lineChars.concat(distractors);
+      shuffleArray(allChars);
+
+      var container = document.getElementById('phase3Candidates');
+      container.innerHTML = '';
+      for (var i = 0; i < allChars.length; i++) {
+        var btn = document.createElement('button');
+        btn.className = 'char-btn';
+        btn.textContent = allChars[i];
+        btn.setAttribute('data-char', allChars[i]);
+        btn.addEventListener('click', onPhase3CandidateClick);
+        btn.addEventListener('touchend', onPhase3CandidateClick, { passive: false });
+        container.appendChild(btn);
+      }
+
+      highlightCurrentBlank3();
+    }
+
+    function highlightCurrentBlank3() {
+      // Remove previous highlights
+      var allBlanks = document.querySelectorAll('#phase3Display .blank.current');
+      for (var i = 0; i < allBlanks.length; i++) {
+        allBlanks[i].classList.remove('current');
+      }
+      if (phase3CharIdx < phase3Blanks.length) {
+        var b = phase3Blanks[phase3CharIdx];
+        var el = document.getElementById('blank3_' + phase3LineIdx + '_' + b.pos);
+        if (el) el.classList.add('current');
+      }
+    }
+
+    function onPhase3CandidateClick(e) {
+      e.preventDefault();
+      if (currentPhase !== 3 || phase3CharIdx >= phase3Blanks.length) return;
+
+      var selectedChar = this.getAttribute('data-char');
+      var expected = phase3Blanks[phase3CharIdx];
+      var blankEl = document.getElementById('blank3_' + phase3LineIdx + '_' + expected.pos);
+
+      if (selectedChar === expected.char) {
+        // Correct - fill in and mark used
+        blankEl.textContent = expected.char;
+        blankEl.classList.remove('blank', 'current');
+        blankEl.classList.add('filled', 'correct');
+
+        // Mark this candidate button as used
+        this.classList.add('used');
+        this.disabled = true;
+
+        phase3CharIdx++;
+
+        if (phase3CharIdx >= phase3Blanks.length) {
+          // Line complete - move to next line
+          setTimeout(function() {
+            startPhase3Line(phase3LineIdx + 1);
+          }, 400);
+        } else {
+          highlightCurrentBlank3();
+        }
+      } else {
+        // Wrong
+        phase3Errors++;
+        totalErrors++;
+        updatePhase3Errors();
+        blankEl.classList.add('wrong');
+        setTimeout(function() {
+          blankEl.classList.remove('wrong');
+        }, 500);
+      }
+    }
+
+    function updatePhase3Errors() {
+      document.getElementById('phase3Errors').textContent = '错误：' + phase3Errors;
+    }
+
+    /* =====================================================
+       END GAME
+       ===================================================== */
+    function endGame() {
+      currentPhase = 0;
+
+      var stars;
+      if (totalErrors === 0) {
+        stars = 3;
+      } else if (totalErrors <= 3) {
+        stars = 2;
+      } else {
+        stars = 1;
+      }
+
+      // Save progress
+      var prog = loadProgress();
+      var prev = prog.stars[currentLevel + 1] || 0;
+      if (stars > prev) prog.stars[currentLevel + 1] = stars;
+      if (currentLevel + 2 > prog.unlocked) {
+        prog.unlocked = currentLevel + 2;
+      }
+      saveProgress(prog);
+
+      // Show overlay
+      var starStr = '';
+      for (var i = 0; i < 3; i++) {
+        starStr += i < stars ? '\u2b50' : '\u2606';
+      }
+
+      document.getElementById('winTitle').textContent = '恭喜过关！';
+      document.getElementById('winStars').textContent = starStr;
+      document.getElementById('winMsg').textContent = '总共错误 ' + totalErrors + ' 次' +
+        (totalErrors === 0 ? '，完美！' : '');
+
+      var nextBtn = document.getElementById('winNextBtn');
+      if (currentLevel + 1 >= POEMS.length) {
+        nextBtn.style.display = 'none';
+      } else {
+        nextBtn.style.display = '';
+      }
+
+      document.getElementById('winOverlay').className = 'overlay show';
+    }
+
+    /* =====================================================
+       BUTTONS
+       ===================================================== */
+    function stopSpeech() {
+      if ('speechSynthesis' in window) speechSynthesis.cancel();
+    }
+
+    document.getElementById('backBtn').addEventListener('click', function() {
+      stopSpeech();
+      window.location.href = 'index.html';
+    });
+
+    document.getElementById('speakBtn').addEventListener('click', function() {
+      var poem = POEMS[currentLevel];
+      var text = poem.title + '，' + poem.author + '。' + poem.lines.join('');
+      speakPoem(text);
+    });
+
+    document.getElementById('startChallengeBtn').addEventListener('click', function() {
+      stopSpeech();
+      startPhase2();
+    });
+
+    document.getElementById('levelListBtn').addEventListener('click', function() {
+      stopSpeech();
+      showLevelSelect();
+    });
+
+    document.getElementById('winBackBtn').addEventListener('click', function() {
+      document.getElementById('winOverlay').className = 'overlay';
+      showLevelSelect();
+    });
+
+    document.getElementById('winNextBtn').addEventListener('click', function() {
+      document.getElementById('winOverlay').className = 'overlay';
+      if (currentLevel + 1 < POEMS.length) {
+        startLevel(currentLevel + 1);
+      }
+    });
+
+    function showLevelSelect() {
+      document.getElementById('gameArea').className = 'game-area';
+      document.getElementById('levelSelect').style.display = '';
+      currentPhase = 0;
+      renderLevelSelect();
+    }
+
+    /* =====================================================
+       INIT
+       ===================================================== */
+    var initProg = loadProgress();
+    if (initProg.unlocked < 1) {
+      initProg.unlocked = 1;
+      saveProgress(initProg);
+    }
+    renderLevelSelect();
+
+    // Register SW
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(function() {});
+    }
+  </script>
+</body>
+</html>

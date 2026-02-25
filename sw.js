@@ -1,10 +1,11 @@
-var CACHE_NAME = 'game-lobby-v3';
+var CACHE_NAME = 'game-lobby-v4';
 var URLS_TO_CACHE = [
   './',
   './index.html',
   './sliding-puzzle.html',
   './memory-game.html',
   './math-challenge.html',
+  './poetry-game.html',
   './style.css',
   './manifest.json'
 ];
