@@ -831,7 +831,8 @@
     var initProg = loadProgress();
     if (initProg.unlocked < 1) {
       initProg.unlocked = 1;
-      saveProgress(initProg);
+      // Don't save progress during initialization - just ensure unlocked is set
+      // saveProgress() expects currentLevel to be set, which it isn't during init
     }
     renderLevelSelect();
 
