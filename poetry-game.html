@@ -139,19 +139,23 @@
 
     // Listen for progress data from parent (integrated mode only)
     if (GameStorage.isInIframe) {
-      var renderTimeout = null;
+      var lastProgressJson = null;
       window.addEventListener('message', function(event) {
         if (event.data.type === 'loadProgress') {
-          window.__gameProgress = event.data.progress;
-          // Debounce re-render to prevent excessive rendering
-          if (renderTimeout) clearTimeout(renderTimeout);
-          renderTimeout = setTimeout(function() {
+          var newProgressJson = JSON.stringify(event.data.progress);
+
+          // Only update and re-render if progress actually changed
+          if (newProgressJson !== lastProgressJson) {
+            console.log('🔄 Progress changed, updating...');
+            window.__gameProgress = event.data.progress;
+            lastProgressJson = newProgressJson;
+
             if (typeof renderLevelSelect === 'function') {
-              console.log('🔄 Re-rendering level select due to progress update');
               renderLevelSelect();
             }
-            renderTimeout = null;
-          }, 100);
+          } else {
+            console.log('⏭️  Progress unchanged, skipping render');
+          }
         }
       });
 
