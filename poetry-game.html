@@ -341,7 +341,9 @@
        LEVEL SELECT RENDERING
        ===================================================== */
     function renderLevelSelect() {
+      console.log('🎨 Rendering level select...');
       var prog = loadProgress();
+      console.log('📊 Progress loaded:', prog);
       var msg = document.getElementById('levelGridMsg');
       if (msg) msg.style.display = 'none';
       var grid = document.getElementById('levelGrid');
@@ -391,6 +393,7 @@
     function onLevelTap(e) {
       e.preventDefault();
       var idx = parseInt(this.getAttribute('data-level'), 10);
+      console.log('🎯 Level tapped:', idx, 'Event type:', e.type);
       startLevel(idx);
     }
 
