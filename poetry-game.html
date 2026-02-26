@@ -382,8 +382,8 @@
           '</span>' +
           (starStr ? '<span style="font-size:0.8rem;letter-spacing:1px;">' + starStr + '</span>' : '');
         btn.setAttribute('data-level', i);
-        btn.addEventListener('touchend', onLevelTap, { passive: true });
         btn.addEventListener('click', onLevelTap);
+        btn.addEventListener('touchend', onLevelTap, { passive: false });
         grid.appendChild(btn);
       }
     }
