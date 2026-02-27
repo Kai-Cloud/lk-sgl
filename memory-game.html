@@ -107,12 +107,19 @@
 
     // Listen for progress data from parent (integrated mode only)
     if (GameStorage.isInIframe) {
+      var lastProgressJson = null;
       window.addEventListener('message', function(event) {
         if (event.data.type === 'loadProgress') {
-          window.__gameProgress = event.data.progress;
-          // Trigger re-render if renderLevelSelect exists
-          if (typeof renderLevelSelect === 'function') {
-            renderLevelSelect();
+          var newProgressJson = JSON.stringify(event.data.progress);
+
+          // Only update and re-render if progress actually changed
+          if (newProgressJson !== lastProgressJson) {
+            window.__gameProgress = event.data.progress;
+            lastProgressJson = newProgressJson;
+
+            if (typeof renderLevelSelect === 'function') {
+              renderLevelSelect();
+            }
           }
         }
       });
@@ -234,8 +241,8 @@
         btn.innerHTML = label + (starStr ? '<span class="level-stars">' + starStr + '</span>' : '');
         if (unlocked) {
           btn.setAttribute('data-level', i);
-          btn.addEventListener('touchend', onLevelTap, { passive: true });
           btn.addEventListener('click', onLevelTap);
+          btn.addEventListener('touchend', onLevelTap, { passive: false });
         }
         grid.appendChild(btn);
       }
@@ -449,7 +456,8 @@
     var initProg = loadProgress();
     if (initProg.unlocked < 1) {
       initProg.unlocked = 1;
-      saveProgress(initProg);
+      // Don't save progress during initialization - just ensure unlocked is set
+      // saveProgress() expects currentLevel to be set, which it isn't during init
     }
     renderLevelSelect();
 
