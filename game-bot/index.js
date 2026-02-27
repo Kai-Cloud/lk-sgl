@@ -11,6 +11,7 @@ const BOT_PASSWORD = process.env.BOT_PASSWORD;
 const BOT_DISPLAY_NAME = process.env.BOT_DISPLAY_NAME || '游戏大厅';
 const BOT_CONTENT_URL = process.env.BOT_CONTENT_URL || '/games/games.json';
 const BOT_ROOM_THEME = process.env.BOT_ROOM_THEME || 'game-lobby';
+const BOT_AVATAR = process.env.BOT_AVATAR || '🎮';
 const REJECT_UNAUTHORIZED = process.env.REJECT_UNAUTHORIZED !== 'false';
 
 async function main() {
@@ -95,7 +96,8 @@ async function main() {
     // Step 4: Report bot metadata (content_url makes this a "content bot")
     socket.emit('botSetMetadata', {
       content_url: BOT_CONTENT_URL,
-      room_theme: BOT_ROOM_THEME
+      room_theme: BOT_ROOM_THEME,
+      avatar: BOT_AVATAR
     });
 
     // Step 5: Ensure private rooms exist with all users, then restore visibility
