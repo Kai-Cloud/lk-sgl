@@ -1,0 +1,30 @@
+[
+  {
+    "id": "sliding-puzzle",
+    "name": "数字华容道",
+    "icon": "🧩",
+    "description": "9 关卡 · 滑块解谜",
+    "file": "sliding-puzzle.html"
+  },
+  {
+    "id": "memory-game",
+    "name": "记忆翻牌",
+    "icon": "🃏",
+    "description": "9 关卡 · 配对记忆",
+    "file": "memory-game.html"
+  },
+  {
+    "id": "math-challenge",
+    "name": "速算挑战",
+    "icon": "🔢",
+    "description": "9 关卡 · 限时计算",
+    "file": "math-challenge.html"
+  },
+  {
+    "id": "poetry-game",
+    "name": "古诗背诵",
+    "icon": "📖",
+    "description": "13 首 · 小学必背",
+    "file": "poetry-game.html"
+  }
+]

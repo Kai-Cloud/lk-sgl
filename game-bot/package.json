@@ -1,0 +1,14 @@
+{
+  "name": "game-bot",
+  "version": "1.0.0",
+  "description": "游戏大厅 Bot - 连接 simple-lan-chat 提供游戏大厅服务",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "axios": "^1.13.5",
+    "dotenv": "^17.3.1",
+    "socket.io-client": "^4.6.1"
+  }
+}
