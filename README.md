@@ -45,3 +45,51 @@ npx serve -l 3000
 - 兼容老款 iPad（iOS 10+）
 - 不依赖任何框架或构建工具
 - 触屏和鼠标均可操作
+
+## 与 simple-lan-chat 集成
+
+本项目可作为 [simple-lan-chat (slc)](https://github.com/Kai-Cloud/lk-slc) 的游戏插件。集成后用户在聊天界面即可看到"游戏大厅"bot，点击进入游玩，游戏进度自动保存。
+
+### 部署要求
+
+lk-sgl 和 slc **必须部署在同一台服务器**，且为 sibling 目录：
+
+```
+/home/user/
+├── lk-slc/          # simple-lan-chat
+└── lk-sgl/          # 本项目（游戏文件 + game-bot）
+```
+
+### 安装步骤
+
+```bash
+# 1. 克隆项目（与 lk-slc 同级目录）
+cd ~
+git clone https://github.com/Kai-Cloud/lk-sgl.git
+
+# 2. 安装 game-bot 依赖
+cd lk-sgl/game-bot
+npm install
+
+# 3. 配置 game-bot
+cp .env.example .env
+# 编辑 .env，填入 SERVER_URL 和 BOT_PASSWORD
+
+# 4. 启动 game-bot
+node index.js
+```
+
+### 使用 PM2 持久化运行
+
+```bash
+# 安装 PM2（如未安装）
+npm install -g pm2
+
+# 启动 game-bot
+cd ~/lk-sgl/game-bot
+pm2 start index.js --name game-bot
+
+# 开机自启
+pm2 save
+pm2 startup
+```
